@@ -1,0 +1,7 @@
+<launch>
+	<!-- commander : -->
+  <arg name="uav_num" default="5" />
+  <node name="commander" pkg="commander" type="commander_node"  output="screen" clear_params="true" cwd="node">
+    <param name="uav_num" value="$(arg uav_num)" /> 
+  </node>
+</launch>
