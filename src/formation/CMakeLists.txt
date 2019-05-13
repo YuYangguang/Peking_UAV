@@ -30,12 +30,9 @@ set(formation_includes
     include
     ${catkin_INCLUDE_DIRS}
     )
-include_directories(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake) 
+include_directories(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 include_directories(${formation_includes}    )
-generate_dynamic_reconfigure_options(  
-  cfg/formationCFG.cfg  
-    
-)  
+
 catkin_package(
     INCLUDE_DIRS   ${formation_includes}
     CATKIN_DEPENDS
@@ -64,12 +61,7 @@ target_link_libraries(formation_node
 )
 add_dependencies(formation_node ${catkin_EXPORTED_TARGETS} )
 
-add_executable(dynamic_reconfigure_node src/dynamic_reconfigure_node.cpp) 
-# for dynamic reconfigure  
-add_dependencies(dynamic_reconfigure_node formation_gencfg)  
-# for python dynamic client  
-add_dependencies(dynamic_reconfigure_node formation_generate_messages_cpp)  
-target_link_libraries(dynamic_reconfigure_node ${catkin_LIBRARIES})  
+
 
 ###############INSTALL#####################
 install(TARGETS formation formation_node

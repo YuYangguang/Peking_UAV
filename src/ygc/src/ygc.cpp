@@ -102,12 +102,7 @@ ygcClass::ygcClass(int argc, char **argv, const char *name)
     bearingInfoInit();
     uavForRec = 1;
     tempName = "/uav"+num2str(uavForRec);
-    //velCmdSub = nh->subscribe(tempName+"/mavros/local_position/velocity", 5,&ygcClass::ReceiveCmdInfo1, this);
-
-    //dataRecPub = nh->advertise<bearing_common::DataRecord>("/ygc/dataRecorded",5);
     targetPosePub = nh->advertise<nav_msgs::Odometry>("/ygc/targetPose",5);
-    //dotBearingPub = nh->advertise<bearing_common::GroupBearing>("/ygc/dot_bearing",2);
-    //agentVelPub = nh->advertise<bearing_common::GroupBearing>("/ygc/agentVel",2);
     allPosiPub = nh->advertise<bearing_common::AllPosition>("/ygc/allPosition",5);
     trigRecPub = nh->advertise<bearing_common::TriggerRec>("/ygc/triggerRec",5);
     lastBearUpTime = 0;
