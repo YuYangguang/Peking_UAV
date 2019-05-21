@@ -55,11 +55,12 @@ smarteye::Formation::Formation(int argc, char** argv, const char * name)
         else //实物飞行模式
         {
             ROS_INFO("This formation node  is in real fly mode");
-            uwbPositionSubsciber = nh->subscribe("uwb_bridge/uwb_data", 10, &smarteye::Formation::uwbPositionReceived,this);
+            uwbPositionSubsciber = nh->subscribe("/uwb_bridge/uwb_data", 10, &smarteye::Formation::uwbPositionReceived,this);
             currentUWBPositionPublisher = nh->advertise<geometry_msgs::PoseStamped>(uavName+"/mavros/vision_pose/pose",10);
-            uwbUpdateTimer = nh->createTimer(ros::Duration(0.03),&Formation::uwbUpdate, this);
+            uwbUpdateTimer = nh->createTimer(ros::Duration(0.05),&Formation::uwbUpdate, this);
             rangeSub = nh->subscribe(uavName+"/mavros/distance_sensor/hrlv_ez4_pub", 10,
                                      &smarteye::Formation::ReceiveLocalRange, this);
+            localPoseSub = nh->subscribe(uavName+"/mavros/local_position/pose", 10, &smarteye::Formation::ReceiveLocalPose,this);
         }
     }
     else
@@ -83,6 +84,7 @@ smarteye::Formation::Formation(int argc, char** argv, const char * name)
 
     setVelPub = nh->advertise<geometry_msgs::TwistStamped>(uavName+"/mavros/setpoint_velocity/cmd_vel", 10);
     allPoseSub = nh->subscribe("/ygc/allPosition",3,&smarteye::Formation::ReceiveAllPose,this);
+    UWBDenyCount = 0;
     currentAngleCount =0;
     InitParam();
 
@@ -253,7 +255,7 @@ void smarteye::Formation::ReceiveKeybdCmd(const keyboard::Key &key)
         positionSet.pose.orientation.x = localPose.pose.orientation.x;
         positionSet.pose.orientation.y = localPose.pose.orientation.y;
         positionSet.pose.orientation.z = localPose.pose.orientation.z;
-        ROS_INFO("current set z is %f",localPose.pose.position.z);
+        ROS_INFO("current set z is %f",positionSet.pose.position.z);
         uavState = YGC_POSCTR;
         break;
     }
@@ -267,7 +269,7 @@ void smarteye::Formation::ReceiveKeybdCmd(const keyboard::Key &key)
         positionSet.pose.orientation.x = localPose.pose.orientation.x;
         positionSet.pose.orientation.y = localPose.pose.orientation.y;
         positionSet.pose.orientation.z = localPose.pose.orientation.z;
-        ROS_INFO("current set z is %f",localPose.pose.position.z);
+        ROS_INFO("current set z is %f",positionSet.pose.position.z);
         uavState = YGC_POSCTR;
         break;
     }
@@ -346,9 +348,19 @@ void smarteye::Formation::update(const ros::TimerEvent &event)
 
 void smarteye::Formation::uwbUpdate(const ros::TimerEvent &event)
 {
+    if(UWBDenyCount > 30)   //表示uwb数据没有更新
+    {
+        ROS_ERROR("The UAV couldn't receive any UWB data");
+        UWBDenyCount = 0;
+
+    }
     uavCurrentUWBPose.header.stamp = ros::Time::now();
     uavCurrentUWBPose.header.frame_id = "/world";
+//    uavCurrentUWBPose.pose.position.x = 1;
+//    uavCurrentUWBPose.pose.position.y = 1;
+//    uavCurrentUWBPose.pose.position.z = 0.2;
     currentUWBPositionPublisher.publish(uavCurrentUWBPose);
+    UWBDenyCount ++;
 }
 
 void smarteye::Formation::ReceiveLocalPose(const geometry_msgs::PoseStampedConstPtr &msg)
@@ -391,8 +403,9 @@ void smarteye::Formation::uwbPositionReceived(const uwb_bridge::uwbMsgConstPtr &
 
     if(uwb_msg->stampID == systemID)
     {
-        uavCurrentUWBPose.pose.position.x = uwb_msg->x;
-        uavCurrentUWBPose.pose.position.y = uwb_msg->y;
+        UWBDenyCount = 0;
+        uavCurrentUWBPose.pose.position.x = -uwb_msg->y;
+        uavCurrentUWBPose.pose.position.y = -uwb_msg->x;  //这里把坐标变为北东天坐标系，要与实际UWB坐标系结合
         //currentUWBPositionPublisher.publish(uavCurrentUWBPose);
 
     }
@@ -411,7 +424,7 @@ void smarteye::Formation::takeoffCtr()
         }
         else
         {
-            positionSet.pose.position.z = 1+initPose.position.z;
+            positionSet.pose.position.z = 0.8+initPose.position.z;
         }
     }
     else   //仿真模式

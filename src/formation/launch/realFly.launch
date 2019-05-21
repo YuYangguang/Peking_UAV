@@ -18,8 +18,8 @@
 <arg name="SimuFlag" default="false" />
     </include>
         <include file="$(find mavros)/launch/px4.launch">
-            
-            <arg name="gcs_url" value=""/>
+            <arg name="fcu_url" value="/dev/ttyUSB0:921600"/>
+            <arg name="gcs_url" value="udp://@192.168.0.100"/>
             <arg name="tgt_system" value="1"/>
             <arg name="tgt_component" value="1"/>
         </include>

@@ -134,6 +134,8 @@ int main(int argc, char **argv)
             data_parse(rawData, &uwbdata);
             uwb_bridge::uwbMsg rosMsg = trans2ros(uwbdata);
             rosMsg.header.stamp=ros::Time::now();
+            rosMsg.x = -rosMsg.x;
+            rosMsg.y = -rosMsg.y;
             uwbPub.publish(rosMsg);
             //下面的memmove函数是内存移动函数，将下一帧报文移动到recbuff的起始处，覆盖掉已经取出的数据
             memmove(recbuff, recbuff + expectedPacketSize, buffsize - expectedPacketSize);

@@ -95,11 +95,12 @@ private:
     float env_k_beta;
     float env_k_gamma;
     int uavState;
+    int UWBDenyCount;
 
 
     geometry_msgs::Pose initPose;
-    geometry_msgs::TwistStamped selfVel;  //自身速度
-    geometry_msgs::TwistStamped neighborVel;  //邻居智能体速度
+
+
     ros::ServiceClient paramClient;
     ros::ServiceClient arming_client;
     ros::ServiceClient setModeClient;
@@ -108,7 +109,7 @@ private:
     void update(const ros::TimerEvent& event);
     void uwbUpdate(const ros::TimerEvent& event);
     ros::Publisher setPositionPub;
-    ros::Publisher tarVelCoorPub;  //目标速度估计协调量发布
+
     ros::Publisher currentUWBPositionPublisher;
     ros::Publisher setVelPub;
     ros::Subscriber agentVelSub;
@@ -133,7 +134,6 @@ private:
     void ReceiveLocalPose(const geometry_msgs::PoseStampedConstPtr& msg);
     void ReceiveLocalRange(const sensor_msgs::RangeConstPtr& range);
     void ReceiveAllPose(const bearing_common::AllPositionConstPtr &msg);
-    void ReceiveAgentVel(const bearing_common::GroupBearingConstPtr &msg);
     void uwbPositionReceived(const uwb_bridge::uwbMsgConstPtr& vicon_msg);
     void takeoffCtr();
     void landCtr();

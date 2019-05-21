@@ -1,10 +1,8 @@
 <launch>
 
-<node name="keyboard" pkg="keyboard" type="keyboard"/>
-
+<node name="keyboard" pkg="keyboard" type="keyboard">
   </node>
  <node name="uwb_node" pkg="uwb_bridge" type="uwb_node"  output="screen" >
-
  </node>
 
 </launch>
