@@ -3,3 +3,4 @@ devel/
 src-build/
 src/CMakeLists.txt.user
 src/*.user
+pyFlightAnalysis
