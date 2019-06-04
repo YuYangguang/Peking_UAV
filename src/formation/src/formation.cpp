@@ -236,14 +236,19 @@ void smarteye::Formation::ReceiveKeybdCmd(const keyboard::Key &key)
     }
     case 'e':  //encirlcement
     {
+        initPose.position.x = localPose.pose.position.x;
+        initPose.position.y = localPose.pose.position.y;
         ROS_INFO("vehicle %d begins enciclement control",systemID);
         uavState = YGC_ENCIRCLE;
         break;
     }
     case 'c':
     {
+        initPose.position.x = localPose.pose.position.x;
+        initPose.position.y = localPose.pose.position.y;
         ROS_INFO("vehicle %d begins circle control",systemID);
         uavState = YGC_CIRCLE;
+        break;
     }
     case 'w':
     {
@@ -404,8 +409,8 @@ void smarteye::Formation::uwbPositionReceived(const uwb_bridge::uwbMsgConstPtr &
     if(uwb_msg->stampID == systemID)
     {
         UWBDenyCount = 0;
-        uavCurrentUWBPose.pose.position.x = -uwb_msg->y;
-        uavCurrentUWBPose.pose.position.y = -uwb_msg->x;  //这里把坐标变为北东天坐标系，要与实际UWB坐标系结合
+        uavCurrentUWBPose.pose.position.x = uwb_msg->y;
+        uavCurrentUWBPose.pose.position.y = uwb_msg->x;  //这里把坐标变为北东天坐标系，要与实际UWB坐标系结合
         //currentUWBPositionPublisher.publish(uavCurrentUWBPose);
 
     }
@@ -453,6 +458,14 @@ void smarteye::Formation::landCtr()
 void smarteye::Formation::encircleCtr(double targetHei)
 {
 
+    /*****注意使用速度控制时，不可同时使用位置控制****/
+    /*****此处x,y值应由算法计算得出*******/
+    velocitySet.twist.linear.x = 1;
+    velocitySet.twist.linear.y = 1;
+    heiCtr.currentHei = localPose.pose.position.z;
+    heiCtr.targetHei = targetHei;
+    velocitySet.twist.linear.z = heiCtr.cacOutput();
+    setVelPub.publish(velocitySet);
 
 }
 
