@@ -12,7 +12,7 @@
 #include <vector>
 #include <fstream>
 #include <unistd.h>
-
+int DATA_COUNT=0;
 
 
 
@@ -64,11 +64,17 @@ int main(int argc, char **argv)
 
         if(readSize == 73)
         {
-            ROS_INFO("read size is %d",readSize);
+            DATA_COUNT++;
+            if(DATA_COUNT>300)
+            {
+                DATA_COUNT = 0;
+                ROS_INFO("The data is received well.");
+            }
+            //ROS_INFO("read size is %d",readSize);
         }
         else
         {
-            ROS_INFO("read size is %d",readSize);
+            //ROS_INFO("read size is %d",readSize);
             continue;
         }
         //同上面的rcv_size区分开，上面的rcv_size是TCP/IP的机理，传输过程中，数据会暂时先存储在rcv_size里.

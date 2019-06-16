@@ -462,6 +462,8 @@ void smarteye::Formation::encircleCtr(double targetHei)
     /*****此处x,y值应由算法计算得出*******/
     velocitySet.twist.linear.x = 1;
     velocitySet.twist.linear.y = 1;
+
+    /****高度控制******/
     heiCtr.currentHei = localPose.pose.position.z;
     heiCtr.targetHei = targetHei;
     velocitySet.twist.linear.z = heiCtr.cacOutput();
