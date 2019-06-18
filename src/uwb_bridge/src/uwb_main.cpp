@@ -118,10 +118,10 @@ int main(int argc, char **argv)
             memcpy(header, recbuff + 4, 4);//收取第5到第8个字节报文,判断是否是"PRES"
             char header_stadard[4]={'P','R','E','S'};
             bool IsMatched = strcmp(header,header_stadard);
-            assert(IsMatched);//判断是否为0045H，是否符合启动字符条件，注意小端对齐
+            //assert(IsMatched);//判断是否为0045H，是否符合启动字符条件，注意小端对齐
             if (!IsMatched)//如果不是0628H，则表示该次数据有误
             {
-                printf("数据帧头不对,显示为%s\n",header);
+                ROS_ERROR("数据帧头不对,显示为%s\n",header);
                 continue;
             }
 
